@@ -6,6 +6,11 @@ framework:
     http_method_override: false
     handle_all_throwables: true
 
+    # trust the remote address because API Gateway has no fixed IP or CIDR range that we can target
+    trusted_proxies: '127.0.0.1'
+    # trust "X-Forwarded-*" headers coming from API Gateway
+    trusted_headers: [ 'x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-port' ]
+
     # this defines the codes of the locales (languages) available in the application
     # https://symfony.com/doc/current/reference/configuration/framework.html#enabled-locales
     enabled_locales: ['ar', 'bg', 'bn', 'bs', 'ca', 'cs', 'de', 'en', 'es', 'eu', 'fr', 'hr', 'id', 'it', 'ja', 'lt', 'ne', 'nl', 'pl', 'pt_BR', 'ro', 'ru', 'sl', 'sq', 'sr_Cyrl', 'sr_Latn', 'tr', 'uk', 'vi', 'zh_CN']

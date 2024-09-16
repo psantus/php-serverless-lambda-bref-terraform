@@ -17,4 +17,9 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 final class Kernel extends BrefKernel
 {
     use MicroKernelTrait;
+
+    protected function getWritableCacheDirectories(): array
+    {
+        return [];
+    }
 }

@@ -14,7 +14,7 @@ resource "aws_lambda_function" "sample_php_lambda_apigw" {
       APP_ENV = "dev"
       APP_DEBUG =  "1"
       APP_SECRET = "2ca64f8d83b9e89f5f19d672841d6bb8"
-
+      DYNAMODB_CACHE_TABLE = aws_dynamodb_table.bref_cache.name
     }
   }
 }
@@ -45,6 +45,11 @@ resource "aws_iam_role_policy_attachment" "lambda_two" {
 resource "aws_iam_role_policy_attachment" "lambda_three" {
   role       = aws_iam_role.iam_for_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_four" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 data "aws_iam_policy_document" "assume_role" {

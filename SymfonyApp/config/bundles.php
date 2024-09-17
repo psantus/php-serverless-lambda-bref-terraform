@@ -18,4 +18,5 @@ return [
     Symfony\UX\StimulusBundle\StimulusBundle::class => ['all' => true],
     Symfonycasts\SassBundle\SymfonycastsSassBundle::class => ['all' => true],
     Bref\Symfony\Messenger\BrefMessengerBundle::class => ['all' => true],
+    Rikudou\DynamoDbCacheBundle\RikudouDynamoDbCacheBundle::class => ['prod' => true],
 ];

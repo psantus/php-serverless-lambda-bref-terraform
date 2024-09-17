@@ -176,6 +176,18 @@
     "psr/log": {
         "version": "1.1.4"
     },
+    "rikudou/psr6-dynamo-db-bundle": {
+        "version": "4.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "2.0",
+            "ref": "b8c90b14aff68e58377f293274db6e5a9855445a"
+        },
+        "files": [
+            "config/packages/prod/rikudou_dynamo_db_cache.yaml"
+        ]
+    },
     "symfony/apache-pack": {
         "version": "1.0",
         "recipe": {

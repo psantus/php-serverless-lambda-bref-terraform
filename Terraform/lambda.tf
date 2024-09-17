@@ -11,11 +11,17 @@ resource "aws_lambda_function" "sample_php_lambda_apigw" {
   layers = ["arn:aws:lambda:eu-west-1:534081306603:layer:php-83-fpm:31"] # See https://bref.sh/docs/runtimes/runtimes-details
   environment {
     variables = {
-      APP_ENV = "dev"
-      APP_DEBUG =  "1"
+      APP_ENV = "prod"
+      DATABASE_URL = "mysql://${aws_rds_cluster.db.master_username}:${aws_rds_cluster.db.master_password}@${aws_rds_cluster.db.endpoint}:3306/${aws_rds_cluster.db.database_name}?serverVersion=8&charset=utf8mb4"
+      APP_DEBUG =  "0"
       APP_SECRET = "2ca64f8d83b9e89f5f19d672841d6bb8"
       DYNAMODB_CACHE_TABLE = aws_dynamodb_table.bref_cache.name
     }
+  }
+
+  vpc_config {
+    security_group_ids = [aws_security_group.lambda.id]
+    subnet_ids = data.aws_subnets.default.ids
   }
 }
 

@@ -1,6 +1,5 @@
 resource "aws_api_gateway_rest_api" "api" {
-  name        = "ServerlessExample"
-  description = "Terraform Serverless Application Example"
+  name        = "php-bref-demo-symfony-app-worker"
 
   endpoint_configuration {
     types = ["REGIONAL"]
@@ -56,6 +55,23 @@ resource "aws_api_gateway_deployment" "deployment" {
 
   rest_api_id = aws_api_gateway_rest_api.api.id
   stage_name  = "v1"
+}
+
+resource "aws_api_gateway_stage" "stage" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  stage_name = "v1"
+  deployment_id = aws_api_gateway_deployment.deployment.id
+}
+
+resource "aws_api_gateway_method_settings" "example" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  stage_name  = aws_api_gateway_stage.stage.stage_name
+  method_path = "*/*"
+
+  settings {
+    metrics_enabled = true
+    logging_level   = "INFO"
+  }
 }
 
 resource "aws_lambda_permission" "allow_api_gateway_invoke_lambda" {

@@ -122,3 +122,24 @@ resource "aws_iam_role_policy_attachment" "apigw_logs" {
 resource "aws_api_gateway_account" "account_level_config_for_logging_from_apigw" {
   cloudwatch_role_arn = aws_iam_role.apigw_role.arn
 }
+
+# Custom domain bref.terracloud.fr
+resource "aws_api_gateway_domain_name" "api_bref" {
+  domain_name     = "api.bref.terracloud.fr"
+  regional_certificate_arn = aws_acm_certificate.api_bref.arn
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+}
+
+# Certificate for bref.terracloud.fr
+resource "aws_acm_certificate" "api_bref" {
+  domain_name       = "api.bref.terracloud.fr"
+  validation_method = "DNS"
+}
+
+resource "aws_apigatewayv2_api_mapping" "custom_name_to_stage" {
+  api_id      = aws_api_gateway_rest_api.api.id
+  domain_name = aws_api_gateway_domain_name.api_bref.domain_name
+  stage       = aws_api_gateway_stage.stage.stage_name
+}

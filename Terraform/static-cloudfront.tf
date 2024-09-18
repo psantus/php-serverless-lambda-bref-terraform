@@ -52,7 +52,12 @@ resource "aws_cloudfront_distribution" "distribution" {
       origin_read_timeout      = 60
     }
 
-    domain_name = "api.bref.terracloud.fr"
+    custom_header {
+      name  = "x-forwarded-host"
+      value = "bref.terracloud.fr"
+    }
+
+    domain_name = aws_api_gateway_domain_name.api_bref.domain_name
     origin_id   = "api"
   }
 

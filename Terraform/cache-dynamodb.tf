@@ -1,3 +1,4 @@
+# Lambda compute is stateless so we use DynamoDB to store application cache
 resource "aws_dynamodb_table" "bref_cache" {
   name         = "php-bref-demo-symfony-cache"
   hash_key     = "id"

@@ -1,3 +1,4 @@
+# Lambda using the PHP-FPM Bref runtime to serve requests via APIGateway
 resource "aws_lambda_function" "sample_php_lambda_apigw" {
   function_name    = "php-bref-demo-symfony-app"
   role             =  aws_iam_role.iam_for_lambda.arn
@@ -14,7 +15,7 @@ resource "aws_lambda_function" "sample_php_lambda_apigw" {
       APP_ENV = "prod"
       DATABASE_URL = "mysql://${aws_rds_cluster.db.master_username}:${aws_rds_cluster.db.master_password}@${aws_rds_cluster.db.endpoint}:3306/${aws_rds_cluster.db.database_name}?serverVersion=8&charset=utf8mb4"
       APP_DEBUG =  "0"
-      APP_SECRET = "2ca64f8d83b9e89f5f19d672841d6bb8"
+      APP_SECRET = "2ca64f8d83b9e89f5f19d672841d6bb8" # DON'T PUT THAT IN REPOSITORY. This is only for demo. In real life use Secrets Manager or SSM Parameter Store.
       DYNAMODB_CACHE_TABLE = aws_dynamodb_table.bref_cache.name
       MESSENGER_TRANSPORT_DSN = aws_sqs_queue.queue.url
     }
@@ -26,9 +27,10 @@ resource "aws_lambda_function" "sample_php_lambda_apigw" {
   }
 }
 
+# Worker that
 resource "aws_lambda_function" "worker" {
   function_name    = "php-bref-demo-symfony-app-worker"
-  role             =  aws_iam_role.iam_for_lambda.arn
+  role             =  aws_iam_role.iam_for_lambda.arn # In real-life, have a specific role with SQS permissions (least privilege approach)
   runtime          = "provided.al2"
   handler          = "bin/consumer.php"
   timeout          = 28
@@ -41,7 +43,7 @@ resource "aws_lambda_function" "worker" {
     variables = {
       APP_ENV = "prod"
       APP_DEBUG =  "0"
-      APP_SECRET = "2ca64f8d83b9e89f5f19d672841d6bb8"
+      APP_SECRET = "2ca64f8d83b9e89f5f19d672841d6bb8" # DON'T PUT THAT IN REPOSITORY. This is only for demo. In real life use Secrets Manager or SSM Parameter Store.
       MESSENGER_TRANSPORT_DSN = aws_sqs_queue.queue.url
       DATABASE_URL = "mysql://${aws_rds_cluster.db.master_username}:${aws_rds_cluster.db.master_password}@${aws_rds_cluster.db.endpoint}:3306/${aws_rds_cluster.db.database_name}?serverVersion=8&charset=utf8mb4"
       DYNAMODB_CACHE_TABLE = aws_dynamodb_table.bref_cache.name
@@ -54,6 +56,15 @@ resource "aws_lambda_function" "worker" {
   }
 }
 
+# worker Lambda access to SQS queue
+resource "aws_lambda_event_source_mapping" "worker" {
+  event_source_arn = aws_sqs_queue.queue.arn
+  enabled          = true
+  function_name    = aws_lambda_function.worker.arn
+  batch_size       = 10
+}
+
+# A Lambda exposing the PHP console. To be triggered via the AWS CLI or the AWS Console.
 resource "aws_lambda_function" "console" {
   function_name    = "php-bref-demo-symfony-app-console"
   role             =  aws_iam_role.iam_for_lambda.arn
@@ -69,7 +80,7 @@ resource "aws_lambda_function" "console" {
     variables = {
       APP_ENV = "prod"
       APP_DEBUG =  "0"
-      APP_SECRET = "2ca64f8d83b9e89f5f19d672841d6bb8"
+      APP_SECRET = "2ca64f8d83b9e89f5f19d672841d6bb8" # DON'T PUT THAT IN REPOSITORY. This is only for demo. In real life use Secrets Manager or SSM Parameter Store.
       MESSENGER_TRANSPORT_DSN = aws_sqs_queue.queue.url
       DATABASE_URL = "mysql://${aws_rds_cluster.db.master_username}:${aws_rds_cluster.db.master_password}@${aws_rds_cluster.db.endpoint}:3306/${aws_rds_cluster.db.database_name}?serverVersion=8&charset=utf8mb4"
       DYNAMODB_CACHE_TABLE = aws_dynamodb_table.bref_cache.name
@@ -82,7 +93,7 @@ resource "aws_lambda_function" "console" {
   }
 }
 
-# Create Zip file for Lambda
+# Create a Zip file with my Symfony app to push to Lambda
 data "archive_file" "zip_php_lambda" {
   type        = "zip"
   source_dir  = "../SymfonyApp"
@@ -116,6 +127,11 @@ resource "aws_iam_role_policy_attachment" "lambda_three" {
 resource "aws_iam_role_policy_attachment" "lambda_four" {
   role       = aws_iam_role.iam_for_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_five" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
 data "aws_iam_policy_document" "assume_role" {

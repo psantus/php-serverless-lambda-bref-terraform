@@ -1,3 +1,4 @@
+# Here I'm using default VPC for convenience, this is not recommended for production.
 resource "aws_default_vpc" "default" {
   tags = {
     Name = "Default VPC"
@@ -17,7 +18,7 @@ data "aws_route_table" "rt" {
 
 resource "aws_security_group" "lambda" {
   name        = "php-bref-demo-symfony-app"
-  description = "Allow outbound"
+  description = "Allow outbound" #Fail but requires destroy to change..
   vpc_id      = aws_default_vpc.default.id
 
   egress {
@@ -40,14 +41,9 @@ resource "aws_security_group" "db" {
     security_groups = [aws_security_group.lambda.id]
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
 
+# DynamoDB endpoint for Lambda to be able to privately push cache data to DynamoDB.
 resource "aws_vpc_endpoint" "dynamodb_endpoint" {
   service_name = "com.amazonaws.eu-west-1.dynamodb"
   vpc_id       = aws_default_vpc.default.id

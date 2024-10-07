@@ -6,6 +6,7 @@ resource "aws_api_gateway_rest_api" "api" {
   }
 }
 
+# Forward all methods to Lambda proxy integration
 resource "aws_api_gateway_resource" "root" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   parent_id   = aws_api_gateway_rest_api.api.root_resource_id
@@ -47,6 +48,7 @@ resource "aws_api_gateway_integration" "lambda_root" {
   uri                     = aws_lambda_function.sample_php_lambda_apigw.invoke_arn
 }
 
+# Deploy API to stage
 resource "aws_api_gateway_deployment" "deployment" {
   depends_on = [
     aws_api_gateway_integration.lambda,
@@ -74,6 +76,7 @@ resource "aws_api_gateway_method_settings" "example" {
   }
 }
 
+# Permissions for API Gateway to invoke Lambda
 resource "aws_lambda_permission" "allow_api_gateway_invoke_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
@@ -139,7 +142,7 @@ resource "aws_api_gateway_account" "account_level_config_for_logging_from_apigw"
   cloudwatch_role_arn = aws_iam_role.apigw_role.arn
 }
 
-# Custom domain bref.terracloud.fr
+# Custom domain api.bref.terracloud.fr (root domain is used by static resources)
 resource "aws_api_gateway_domain_name" "api_bref" {
   domain_name     = "api.bref.terracloud.fr"
   regional_certificate_arn = aws_acm_certificate.api_bref.arn
@@ -148,7 +151,9 @@ resource "aws_api_gateway_domain_name" "api_bref" {
   }
 }
 
-# Certificate for bref.terracloud.fr
+# Certificate for api.bref.terracloud.fr
+# NB : here I'm creating Route53 entries to validate certificate manually (in another account)
+# but there is a nice module to do it all at once.
 resource "aws_acm_certificate" "api_bref" {
   domain_name       = "api.bref.terracloud.fr"
   validation_method = "DNS"

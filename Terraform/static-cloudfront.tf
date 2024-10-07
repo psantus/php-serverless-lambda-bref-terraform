@@ -1,4 +1,4 @@
-# Bucket for file storage
+# Bucket for file storage for static resources
 resource "aws_s3_bucket" "storage_public" {
   bucket = "php-bref-demo-symfony-app-static"
 
@@ -74,7 +74,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     target_origin_id         = aws_s3_bucket.storage_public.id
     viewer_protocol_policy   = "redirect-to-https"
     cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" #Hard-Coded: Caching optimized
-    origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
+    origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" #Hard-Coded CORS-S3Origin - see https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html#managed-origin-request-policy-cors-s3
   }
 
   ordered_cache_behavior {
@@ -83,7 +83,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     cached_methods           = ["GET", "HEAD", "OPTIONS"]
     target_origin_id         = aws_s3_bucket.storage_public.id
     viewer_protocol_policy   = "redirect-to-https"
-    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" #Hard-Coded: Caching optimized
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
   }
 
@@ -93,7 +93,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     cached_methods           = ["GET", "HEAD", "OPTIONS"]
     target_origin_id         = aws_s3_bucket.storage_public.id
     viewer_protocol_policy   = "redirect-to-https"
-    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" #Hard-Coded: Caching optimized
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
   }
 
@@ -103,7 +103,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     cached_methods           = ["GET", "HEAD", "OPTIONS"]
     target_origin_id         = aws_s3_bucket.storage_public.id
     viewer_protocol_policy   = "redirect-to-https"
-    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" #Hard-Coded: Caching optimized
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
   }
 
@@ -113,7 +113,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     cached_methods           = ["GET", "HEAD", "OPTIONS"]
     target_origin_id         = aws_s3_bucket.storage_public.id
     viewer_protocol_policy   = "redirect-to-https"
-    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" #Hard-Coded: Caching optimized
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
   }
 
@@ -123,7 +123,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     cached_methods           = ["GET", "HEAD", "OPTIONS"]
     target_origin_id         = aws_s3_bucket.storage_public.id
     viewer_protocol_policy   = "redirect-to-https"
-    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" #Hard-Coded: Caching optimized
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
   }
 
@@ -133,7 +133,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     cached_methods           = ["GET", "HEAD", "OPTIONS"]
     target_origin_id         = aws_s3_bucket.storage_public.id
     viewer_protocol_policy   = "redirect-to-https"
-    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" #Hard-Coded: Caching optimized
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
   }
 
@@ -143,7 +143,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     cached_methods           = ["GET", "HEAD", "OPTIONS"]
     target_origin_id         = aws_s3_bucket.storage_public.id
     viewer_protocol_policy   = "redirect-to-https"
-    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" #Hard-Coded: Caching optimized
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
   }
 
@@ -153,7 +153,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     cached_methods           = ["GET", "HEAD", "OPTIONS"]
     target_origin_id         = aws_s3_bucket.storage_public.id
     viewer_protocol_policy   = "redirect-to-https"
-    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" #Hard-Coded: Caching optimized
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
   }
 
@@ -187,12 +187,15 @@ resource "aws_cloudfront_origin_access_control" "oac_s3" {
 }
 
 # Certificate for bref.terracloud.fr
+# NB : here I'm creating Route53 entries to validate certificate manually (in another account)
+# but there is a nice module to do it all at once.
 resource "aws_acm_certificate" "root_bref" {
   provider = aws.us-east-1
   domain_name       = "bref.terracloud.fr"
   validation_method = "DNS"
 }
 
+# Push static assets to S3 Bucket
 module "thisdir" {
   source  = "registry.terraform.io/hashicorp/dir/template"
   version = "1.0.2"

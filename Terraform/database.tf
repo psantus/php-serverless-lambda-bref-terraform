@@ -1,3 +1,4 @@
+# An Aurora cluster to store application DB. Not strictly serverless (doesn't scale-to-zero)
 resource "aws_rds_cluster" "db" {
   cluster_identifier      = "aurora-cluster-demo"
   engine                  = "aurora-mysql"

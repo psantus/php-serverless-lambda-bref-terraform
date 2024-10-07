@@ -1,3 +1,5 @@
+# Replace Symfony Messenger internal queue with SQS
+
 resource "aws_sqs_queue" "queue" {
   name = "php-bref-demo-symfony-app-queue"
 }

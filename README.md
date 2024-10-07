@@ -22,4 +22,9 @@ You can deploy it with a bastion.
 ![Screenshot of running app](bref-screenshot.png)
 ![Articles can be edited!](bref-screenshot2.png)
 
-# Get in touch!
+## Author
+Paul SANTUS, an independant AWS Cloud Consultant
+* Company website: https://www.terracloud.fr
+* LinkedIn: https://www.linkedin.com/in/paulsantus/
+
+Please do not hesitate to get in touch!

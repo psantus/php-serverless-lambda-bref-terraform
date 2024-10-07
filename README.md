@@ -18,3 +18,4 @@ You can deploy it with a bastion.
 
 ## Result
 ![Screenshot of running app](bref-screenshot.png)
+![Articles can be edited!](bref-screenshot2.png)

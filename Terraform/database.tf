@@ -2,7 +2,7 @@
 resource "aws_rds_cluster" "db" {
   cluster_identifier      = "aurora-cluster-demo"
   engine                  = "aurora-mysql"
-  engine_version          = "8.0.mysql_aurora.3.05.2"
+  engine_version          = "8.0.mysql_aurora.3.08.2"
   availability_zones      = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   database_name           = "mydb"
   master_username         = "foo"
@@ -10,7 +10,7 @@ resource "aws_rds_cluster" "db" {
 
   serverlessv2_scaling_configuration {
     max_capacity = 32
-    min_capacity = 1
+    min_capacity = 0
   }
 
   vpc_security_group_ids = [aws_security_group.db.id]

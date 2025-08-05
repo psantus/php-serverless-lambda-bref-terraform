@@ -1,3 +1,9 @@
+module "bref-layer" {
+  source  = "psantus/bref-layer/null"
+  aws_region = var.aws_region
+  php_version = "83"
+}
+
 # Lambda using the PHP-FPM Bref runtime to serve requests via APIGateway
 resource "aws_lambda_function" "sample_php_lambda_apigw" {
   function_name    = "php-bref-demo-symfony-app"
@@ -9,7 +15,7 @@ resource "aws_lambda_function" "sample_php_lambda_apigw" {
   source_code_hash = data.archive_file.zip_php_lambda.output_base64sha256
   publish          = false
   memory_size      = 1024
-  layers = ["arn:aws:lambda:eu-west-1:534081306603:layer:php-83-fpm:31"] # See https://bref.sh/docs/runtimes/runtimes-details
+  layers = module.bref-layer.fpm_layers # See https://bref.sh/docs/runtimes/runtimes-details
   environment {
     variables = {
       APP_ENV = "prod"
@@ -38,7 +44,7 @@ resource "aws_lambda_function" "worker" {
   source_code_hash = data.archive_file.zip_php_lambda.output_base64sha256
   publish          = false
   memory_size      = 1024
-  layers = ["arn:aws:lambda:eu-west-1:534081306603:layer:php-83-fpm:31"] # See https://bref.sh/docs/runtimes/runtimes-details
+  layers = module.bref-layer.function_layers # See https://bref.sh/docs/runtimes/runtimes-details
   environment {
     variables = {
       APP_ENV = "prod"
@@ -75,7 +81,7 @@ resource "aws_lambda_function" "console" {
   source_code_hash = data.archive_file.zip_php_lambda.output_base64sha256
   publish          = false
   memory_size      = 1024
-  layers = ["arn:aws:lambda:eu-west-1:534081306603:layer:php-83-fpm:31"] # See https://bref.sh/docs/runtimes/runtimes-details
+  layers = module.bref-layer.console_layers # See https://bref.sh/docs/runtimes/runtimes-details
   environment {
     variables = {
       APP_ENV = "prod"

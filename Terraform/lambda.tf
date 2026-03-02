@@ -1,14 +1,15 @@
 module "bref-layer" {
   source  = "psantus/bref-layer/null"
-  aws_region = var.aws_region
+  aws_region  = var.aws_region
   php_version = "83"
+  bref_major  = 3
 }
 
 # Lambda using the PHP-FPM Bref runtime to serve requests via APIGateway
 resource "aws_lambda_function" "sample_php_lambda_apigw" {
   function_name    = "php-bref-demo-symfony-app"
   role             =  aws_iam_role.iam_for_lambda.arn
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   handler          = "public/index.php"
   timeout          = 28
   filename         = data.archive_file.zip_php_lambda.output_path
@@ -24,6 +25,7 @@ resource "aws_lambda_function" "sample_php_lambda_apigw" {
       APP_SECRET = "2ca64f8d83b9e89f5f19d672841d6bb8" # DON'T PUT THAT IN REPOSITORY. This is only for demo. In real life use Secrets Manager or SSM Parameter Store.
       DYNAMODB_CACHE_TABLE = aws_dynamodb_table.bref_cache.name
       MESSENGER_TRANSPORT_DSN = aws_sqs_queue.queue.url
+      BREF_RUNTIME = "fpm"
     }
   }
 
@@ -37,7 +39,7 @@ resource "aws_lambda_function" "sample_php_lambda_apigw" {
 resource "aws_lambda_function" "worker" {
   function_name    = "php-bref-demo-symfony-app-worker"
   role             =  aws_iam_role.iam_for_lambda.arn # In real-life, have a specific role with SQS permissions (least privilege approach)
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   handler          = "bin/consumer.php"
   timeout          = 28
   filename         = data.archive_file.zip_php_lambda.output_path
@@ -53,6 +55,7 @@ resource "aws_lambda_function" "worker" {
       MESSENGER_TRANSPORT_DSN = aws_sqs_queue.queue.url
       DATABASE_URL = "mysql://${aws_rds_cluster.db.master_username}:${aws_rds_cluster.db.master_password}@${aws_rds_cluster.db.endpoint}:3306/${aws_rds_cluster.db.database_name}?serverVersion=8&charset=utf8mb4"
       DYNAMODB_CACHE_TABLE = aws_dynamodb_table.bref_cache.name
+      BREF_RUNTIME = "function"
     }
   }
 
@@ -74,7 +77,7 @@ resource "aws_lambda_event_source_mapping" "worker" {
 resource "aws_lambda_function" "console" {
   function_name    = "php-bref-demo-symfony-app-console"
   role             =  aws_iam_role.iam_for_lambda.arn
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   handler          = "bin/console"
   timeout          = 28
   filename         = data.archive_file.zip_php_lambda.output_path
@@ -90,6 +93,7 @@ resource "aws_lambda_function" "console" {
       MESSENGER_TRANSPORT_DSN = aws_sqs_queue.queue.url
       DATABASE_URL = "mysql://${aws_rds_cluster.db.master_username}:${aws_rds_cluster.db.master_password}@${aws_rds_cluster.db.endpoint}:3306/${aws_rds_cluster.db.database_name}?serverVersion=8&charset=utf8mb4"
       DYNAMODB_CACHE_TABLE = aws_dynamodb_table.bref_cache.name
+      BREF_RUNTIME = "console"
     }
   }
 
